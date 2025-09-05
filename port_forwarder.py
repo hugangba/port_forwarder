@@ -20,6 +20,13 @@ async def handle_client(reader, writer):
         await writer.wait_closed()
         return
 
+    # 检查服务器 IPv6 地址前缀
+    network = ipaddress.IPv6Network("2001:470:19:53f::/64")
+    if server_ip not in network:
+        writer.close()
+        await writer.wait_closed()
+        return
+
     # 基于服务器目标 IPv6 地址的最后四个段生成 IPv4 A.B.C.D
     try:
         segments = server_ip.exploded.split(':')[-4:]  # 取最后四个段
